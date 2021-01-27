@@ -40,27 +40,32 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     Color Press_Color;
     int xMouse = 0;
     int yMouse = 0;
-    int[] incrementAmount = { 
+    int[] incrementAmount = {
         5, // hover increment
-        10 // pressed increment
+        10, // pressed increment
+        1,  //circle expansion increment
+        2
     };
-    int[] sleepAmount = { 
+    int[] sleepAmount = {
         5, // hover sleep time
         8, // pressed sleep time
-        4 // pressed size increase time
+        4, // pressed size increase time
+        4  //selected increase time
     };
     // Turns on/off when hovering or pressing JPanel
     boolean[] switches = { 
         false, //background
         false, // hovering
-        false // pressed
+        false, // pressed
+        false  //selected_mode
     };
     // The alpha for the colors
     int[] Alphas = { 
         255, // background Alpha
         150, // Text Alpha
         0, // Hover Alpha
-        0 // Press Alpha
+        0, // Press Alpha
+        0  // selected Alpha
     };
 
     public static void main(String[] args) {
@@ -225,6 +230,10 @@ public class PressSpreadButton extends JPanel implements MouseListener {
         catch(java.util.ConcurrentModificationException e) {}
         catch(java.util.NoSuchElementException e) {}
         
+        Alphas[4] = AlphaCheck(4);
+        graphics.setColor(new Color(Press_Color.getRed(), Press_Color.getGreen(), Press_Color.getBlue(), Alphas[4]));
+        graphics.fillRoundRect(0, 0, getWidth(), getHeight(), round, round);
+        
         graphics.setColor(Background_Color);
         graphics.setStroke(new BasicStroke(6));
         graphics.drawRoundRect(0, 0, getWidth(), getHeight(), 0, 0);
@@ -260,6 +269,13 @@ public class PressSpreadButton extends JPanel implements MouseListener {
         this.incrementAmount[1] = value;
     }
 
+    /**
+     * Sets the value of increments to change pressed circle size
+     * @param value the amount increased/decreased per increment
+     */
+    public void setCircleExpansionIncrementAmount(int value) {
+        this.incrementAmount[2] = value;
+    }
     /**
      * Sets the value of increments to change alphas
      * @param value the amount increased/decreased per increment
@@ -370,6 +386,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      * Starts the pressing fade in
      */
     public void PressFadeIn() {
+        // System.out.println("fading in");
         PressSpreadButtonCircle c = new PressSpreadButtonCircle(xMouse, yMouse);
         circles.add(c);
         fadeCircleIn(c);
@@ -392,7 +409,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
             public void run() {
                 int wantedValue = (int) (getWidth() * 1.1);
                 while(circle.getRadius() != wantedValue) {
-                    circle.addRadius(1);
+                    circle.addRadius(incrementAmount[2]);
                     update();
                     try {
                         sleep(sleepAmount[2]);
@@ -412,8 +429,10 @@ public class PressSpreadButton extends JPanel implements MouseListener {
                 while(!circle.getExpanding()) {
                     sleepTime(2);
                 }
+                // System.out.println(circle.getAlpha());
                 while(circle.getAlpha() > 0) {
                     circle.setAlpha(circle.getAlpha() - (incrementAmount[1]));
+                    // System.out.println(circle.getAlpha());
                     update();
                     sleepTime(sleepAmount[1] * 2);
                 }
@@ -424,9 +443,11 @@ public class PressSpreadButton extends JPanel implements MouseListener {
                     }
                     x++;
                 }
+                // System.out.println("Size = " + circles.size());
             }
         }; t.start();
     }
+
     /**
      * Increases the alpha of the circle while button being pressed
      * @param circle The Circle being edited
@@ -449,7 +470,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      * @param switchPosition boolean based off hovering or pressing, 0 = hovering, 1 = pressing
      * @param active boolean on if alpha should be increasing or decreasing, false = decreasing, true = increasing
      */
-    private void changeAlphaValues(int colorAlphaPos, int switchPosition, boolean active) {
+    public void changeAlphaValues(int colorAlphaPos, int switchPosition, boolean active) {
         Thread t = new Thread() {
             public void run() {
                 switches[switchPosition] = active;
@@ -465,6 +486,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
                         Alphas[colorAlphaPos] -= incrementAmount[switchPosition];
                         Alphas[1] -= 2;
                     }
+                    
                     if(Alphas[1] > 255) {
                         Alphas[1] = 255;
                     } else if(Alphas[1] < 150) {
@@ -491,7 +513,9 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+        
+    }
 
     @Override
     public void mousePressed(MouseEvent e) {
