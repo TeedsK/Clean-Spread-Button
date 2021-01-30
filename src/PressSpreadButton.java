@@ -1,4 +1,4 @@
-package button;
+package src.general.button;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -40,6 +40,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     Color Press_Color;
     int xMouse = 0;
     int yMouse = 0;
+    boolean fadeInText = true;
     int[] incrementAmount = {
         5, // hover increment
         10, // pressed increment
@@ -62,14 +63,14 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     // The alpha for the colors
     int[] Alphas = { 
         255, // background Alpha
-        150, // Text Alpha
+        255, // Text Alpha
         0, // Hover Alpha
         0, // Press Alpha
         0  // selected Alpha
     };
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame();
+        JFrame frame = new JFrame("Example");
         JPanel test = new JPanel();
         frame.add(test);
         test.setLayout(new BoxLayout(test, BoxLayout.X_AXIS));
@@ -179,7 +180,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
             text.setHorizontalAlignment(JLabel.CENTER);
             Font u = new Font("Calibri", Font.PLAIN, 15);
             try {
-                u = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts//OpenSans//open-sans.semibold.ttf"));
+                u = Font.createFont(Font.TRUETYPE_FONT, new File("src/Fonts/OpenSans/open-sans.semibold.ttf"));
             } catch(Exception err1) {}
             text.setFont(u.deriveFont(Font.PLAIN, 14.3f));
             this.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
@@ -189,6 +190,13 @@ public class PressSpreadButton extends JPanel implements MouseListener {
         }
     }
     
+    /**
+     * @param size the desired font size
+     */
+    public void setFontSize(float size) {
+        text.setFont(text.getFont().deriveFont(Font.PLAIN, size));
+    }
+
     /**
      * Sets the image for the left side of the button
      * @param image the file location of the image
@@ -209,35 +217,54 @@ public class PressSpreadButton extends JPanel implements MouseListener {
         Graphics2D graphics = (Graphics2D) g;
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        Alphas[0] = AlphaCheck(0);
-        graphics.setColor(new Color(Button_Color.getRed(), Button_Color.getGreen(), Button_Color.getBlue(), Alphas[0]));
-        graphics.fillRoundRect(0, 0, getWidth(), getHeight(), round, round);
-
-        Alphas[2] = AlphaCheck(2);
-        graphics.setColor(new Color(Hover_Color.getRed(), Hover_Color.getGreen(), Hover_Color.getBlue(), Alphas[2]));
-        graphics.fillRoundRect(0, 0, getWidth(), getHeight(), round, round);
+        if(Button_Color != null) {
+            Alphas[0] = AlphaCheck(0);
+            graphics.setColor(new Color(Button_Color.getRed(), Button_Color.getGreen(), Button_Color.getBlue(), Alphas[0]));
+            graphics.fillRoundRect(0, 0, getWidth(), getHeight(), round, round);
+        }
         
-        try {
-            for(PressSpreadButtonCircle c : circles) {
-                c.setAlpha(c.getAlpha());
-                if(c.getAlpha() != 0) {
-                    graphics.setColor(new Color(Press_Color.getRed(), Press_Color.getGreen(), Press_Color.getBlue(), c.getAlpha()));
-                    int radius = c.getRadius();
-                    graphics.fillOval(c.getXMouse() - radius, c.getYMouse() - radius, (radius * 2), (radius * 2));
+        if(Hover_Color != null) {
+            Alphas[2] = AlphaCheck(2);
+            graphics.setColor(new Color(Hover_Color.getRed(), Hover_Color.getGreen(), Hover_Color.getBlue(), Alphas[2]));
+            graphics.fillRoundRect(0, 0, getWidth(), getHeight(), round, round);
+        }
+        
+        if(Press_Color != null) {
+            try {
+                for(PressSpreadButtonCircle c : circles) {
+                    c.setAlpha(c.getAlpha());
+                    if(c.getAlpha() != 0) {
+                        graphics.setColor(new Color(Press_Color.getRed(), Press_Color.getGreen(), Press_Color.getBlue(), c.getAlpha()));
+                        int radius = c.getRadius();
+                        graphics.fillOval(c.getXMouse() - radius, c.getYMouse() - radius, (radius * 2), (radius * 2));
+                    }
                 }
-            }
-        } 
-        catch(java.util.ConcurrentModificationException e) {}
-        catch(java.util.NoSuchElementException e) {}
+            } 
+            catch(java.util.ConcurrentModificationException e) {}
+            catch(java.util.NoSuchElementException e) {}
+        }
         
-        Alphas[4] = AlphaCheck(4);
-        graphics.setColor(new Color(Press_Color.getRed(), Press_Color.getGreen(), Press_Color.getBlue(), Alphas[4]));
-        graphics.fillRoundRect(0, 0, getWidth(), getHeight(), round, round);
+        if(Press_Color != null) {
+            Alphas[4] = AlphaCheck(4);
+            graphics.setColor(new Color(Press_Color.getRed(), Press_Color.getGreen(), Press_Color.getBlue(), Alphas[4]));
+            graphics.fillRoundRect(0, 0, getWidth(), getHeight(), round, round);
+        }
         
-        graphics.setColor(Background_Color);
-        graphics.setStroke(new BasicStroke(6));
-        graphics.drawRoundRect(0, 0, getWidth(), getHeight(), 0, 0);
-        graphics.drawRoundRect(0, 0, getWidth(), getHeight(), round, round);
+        if(Background_Color != null) {
+            graphics.setColor(Background_Color);
+            graphics.setStroke(new BasicStroke(6));
+            graphics.drawRoundRect(0, 0, getWidth(), getHeight(), 0, 0);
+            graphics.drawRoundRect(0, 0, getWidth(), getHeight(), round, round);
+        }
+    }
+
+    /**
+     * Fades out all alphas
+     */
+    public void fadeOutAll() {
+        HoverFadeOut();
+        PressFadeOut();
+
     }
 
     /**
@@ -304,6 +331,15 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     }
 
     /**
+     * Sets the Press color
+     * @param color desired color of the pressed color
+     */
+    public void setPressColor(Color color) {
+        this.Press_Color = color;
+    }
+    
+
+    /**
      * Adds any JPanels to repaint while repainting this button
      * @param panels the parent jpanels to be appended
      */
@@ -350,8 +386,14 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      * updates any connected jpanels
      */
     private void update() {
-        repaint();
         revalidate();
+        repaint();
+        for(JPanel panel : ParentJPanels) {
+            if(panel.isVisible() && panel.getBackground().getAlpha() > 0) {
+                panel.revalidate();
+                panel.repaint();
+            }
+        }
     }
 
     /**
@@ -373,6 +415,9 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      */
     public void HoverFadeIn() {
         changeAlphaValues(2, 1, true);
+        if(fadeInText) {
+            changeAlphaValues(1, 1, true);
+        }
     }
 
     /**
@@ -380,13 +425,15 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      */
     public void HoverFadeOut() {
         changeAlphaValues(2, 1, false);
+        if(fadeInText) {
+            changeAlphaValues(1, 1, false);
+        }
     }
 
     /**
      * Starts the pressing fade in
      */
     public void PressFadeIn() {
-        // System.out.println("fading in");
         PressSpreadButtonCircle c = new PressSpreadButtonCircle(xMouse, yMouse);
         circles.add(c);
         fadeCircleIn(c);
@@ -429,21 +476,20 @@ public class PressSpreadButton extends JPanel implements MouseListener {
                 while(!circle.getExpanding()) {
                     sleepTime(2);
                 }
-                // System.out.println(circle.getAlpha());
                 while(circle.getAlpha() > 0) {
                     circle.setAlpha(circle.getAlpha() - (incrementAmount[1]));
-                    // System.out.println(circle.getAlpha());
                     update();
                     sleepTime(sleepAmount[1] * 2);
                 }
                 for(int x = 0; x < circles.size(); x++) {
                     if(circles.get(x).equals(circle) && (x > 0 && x < circles.size())) {
-                        circles.remove(x);
+                        try {
+                            circles.remove(x);
+                        } catch(java.lang.IndexOutOfBoundsException e) {}
                         break;
                     }
                     x++;
                 }
-                // System.out.println("Size = " + circles.size());
             }
         }; t.start();
     }
@@ -481,25 +527,57 @@ public class PressSpreadButton extends JPanel implements MouseListener {
                 while(switches[switchPosition] == active && Alphas[colorAlphaPos] != wantedValue) {
                     if(active) {
                         Alphas[colorAlphaPos] += incrementAmount[switchPosition];
-                        Alphas[1] += 2;
                     } else {
                         Alphas[colorAlphaPos] -= incrementAmount[switchPosition];
-                        Alphas[1] -= 2;
                     }
-                    
-                    if(Alphas[1] > 255) {
-                        Alphas[1] = 255;
-                    } else if(Alphas[1] < 150) {
-                        Alphas[1] = 150;
-                    }
-                    if(text != null) {
-                        text.setForeground(new Color(255,255,255,Alphas[1]));
+                    if(Math.abs(wantedValue - Alphas[colorAlphaPos]) <= incrementAmount[switchPosition] + 3) {
+                        Alphas[colorAlphaPos] = wantedValue;
                     }
                     update();
                     sleepTime(sleepAmount[switchPosition]);
                 }
             }
         }; t.start();
+    }
+
+    /**
+     * Changes the alpha of the color given
+     * @param colorAlphaPos The position of the alphas 0 = background, 1 = text, 2 = hovering, 3 = pressed
+     * @param switchPosition boolean based off hovering or pressing, 0 = hovering, 1 = pressing
+     * @param active boolean on if alpha should be increasing or decreasing, false = decreasing, true = increasing
+     * @param multiplier adds a multiplier to the amount the Alpha changes
+     */
+    public void changeAlphaValues(int colorAlphaPos, int switchPosition, boolean active, double multiplier) {
+        Thread t = new Thread() {
+            public void run() {
+                switches[switchPosition] = active;
+                int wantedValue = 0;
+                if(active) {
+                    wantedValue = 255;
+                }
+                while(switches[switchPosition] == active && Alphas[colorAlphaPos] != wantedValue) {
+                    if(active) {
+                        Alphas[colorAlphaPos] += (int) (incrementAmount[switchPosition] * multiplier);
+                    } else {
+                        Alphas[colorAlphaPos] -= (int) (incrementAmount[switchPosition] * multiplier);
+                    }
+                    if(Math.abs(wantedValue - Alphas[colorAlphaPos]) <= incrementAmount[switchPosition] + 3) {
+                        Alphas[colorAlphaPos] = wantedValue;
+                    }
+                    update();
+                    sleepTime(sleepAmount[switchPosition]);
+                }
+            }
+        }; t.start();
+    }
+
+    private int checkAlpha(int pos) {
+        if(Alphas[pos] > 255) {
+            Alphas[pos] = 255;
+        } else if(Alphas[pos] < 150) {
+            Alphas[pos] = 150;
+        }
+        return Alphas[pos];
     }
 
     /**
@@ -513,9 +591,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        
-    }
+    public void mouseClicked(MouseEvent e) {}
 
     @Override
     public void mousePressed(MouseEvent e) {
