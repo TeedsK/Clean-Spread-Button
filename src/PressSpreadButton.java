@@ -297,6 +297,14 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     }
 
     /**
+     * Sets the value of increments to change selected buttons alphas
+     * @param value the amount increased/decreased per increment     
+     */
+    public void setSelectedIncrementAmount(int value) {
+        this.incrementAmount[3] = value;
+    }
+
+    /**
      * Sets the value of increments to change pressed circle size
      * @param value the amount increased/decreased per increment
      */
