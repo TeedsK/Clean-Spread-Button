@@ -1,4 +1,4 @@
-package src.general.button;
+package Animations.Button;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -33,7 +33,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     ArrayList<PressSpreadButtonCircle> circles = new ArrayList<PressSpreadButtonCircle>();
     int round = 0; // the roundness of JPanel
     JLabel text;
-    JLabel image = new JLabel();
+    JLabel image;
     Color Background_Color;
     Color Button_Color;
     Color Hover_Color;
@@ -62,11 +62,12 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     };
     // The alpha for the colors
     int[] Alphas = { 
-        255, // background Alpha
+        255, // Color of the button Alpha
         255, // Text Alpha
         0, // Hover Alpha
         0, // Press Alpha
-        0  // selected Alpha
+        0,  // selected Alpha
+        255 //Background of the button alpha
     };
 
     public static void main(String[] args) {
@@ -183,9 +184,11 @@ public class PressSpreadButton extends JPanel implements MouseListener {
                 u = Font.createFont(Font.TRUETYPE_FONT, new File("src/Fonts/OpenSans/open-sans.semibold.ttf"));
             } catch(Exception err1) {}
             text.setFont(u.deriveFont(Font.PLAIN, 14.3f));
-            this.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
-            image.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-            this.add(image, BorderLayout.WEST);
+            if(image != null) {
+                this.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
+                image.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+                this.add(image, BorderLayout.WEST);
+            }
             this.add(text, BorderLayout.CENTER);
         }
     }
@@ -251,7 +254,8 @@ public class PressSpreadButton extends JPanel implements MouseListener {
         }
         
         if(Background_Color != null) {
-            graphics.setColor(Background_Color);
+            Alphas[5] = AlphaCheck(5);
+            graphics.setColor(new Color(Background_Color.getRed(), Background_Color.getGreen(), Background_Color.getBlue(), Alphas[5]));
             graphics.setStroke(new BasicStroke(6));
             graphics.drawRoundRect(0, 0, getWidth(), getHeight(), 0, 0);
             graphics.drawRoundRect(0, 0, getWidth(), getHeight(), round, round);
@@ -390,6 +394,15 @@ public class PressSpreadButton extends JPanel implements MouseListener {
         this.Alphas[0] = alpha;
         update();
     }
+
+    /**
+     * Get the alphas array
+     * @return the Alpha value array
+     */
+    public int[] getAlphas() {
+        return Alphas;
+    }
+
     /**
      * updates any connected jpanels
      */
@@ -577,15 +590,6 @@ public class PressSpreadButton extends JPanel implements MouseListener {
                 }
             }
         }; t.start();
-    }
-
-    private int checkAlpha(int pos) {
-        if(Alphas[pos] > 255) {
-            Alphas[pos] = 255;
-        } else if(Alphas[pos] < 150) {
-            Alphas[pos] = 150;
-        }
-        return Alphas[pos];
     }
 
     /**
