@@ -148,6 +148,34 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      * @param background color of panel behind button
      * @param buttonColor color of the button
      * @param hoverColor Color to change to when hovering
+     */
+    public PressSpreadButton(Color background, Color buttonColor, Color hoverColor) {
+        this.Button_Color = buttonColor;
+        this.Background_Color = background;
+        this.Hover_Color = hoverColor;
+        setup();
+    }
+
+    /**
+     * 
+     * @param background color of panel behind button
+     * @param buttonColor color of the button
+     * @param hoverColor Color to change to when hovering
+     * @param roundness The roundness of the button
+     */
+    public PressSpreadButton(Color background, Color buttonColor, Color hoverColor, int roundness) {
+        this.Button_Color = buttonColor;
+        this.Background_Color = background;
+        this.Hover_Color = hoverColor;
+        this.round = roundness;
+        setup();
+    }
+
+    /**
+     * 
+     * @param background color of panel behind button
+     * @param buttonColor color of the button
+     * @param hoverColor Color to change to when hovering
      * @param pressColor Color to change to when pressing
      * @param roundness The roundness of the button
      */
@@ -503,12 +531,12 @@ public class PressSpreadButton extends JPanel implements MouseListener {
                     sleepTime(sleepAmount[1] * 2);
                 }
                 for(int x = 0; x < circles.size(); x++) {
-                    if(circles.get(x).equals(circle) && (x > 0 && x < circles.size())) {
-                        try {
+                    try {
+                        if(circles.get(x).equals(circle) && (x > 0 && x < circles.size())) {
                             circles.remove(x);
-                        } catch(java.lang.IndexOutOfBoundsException e) {}
-                        break;
-                    }
+                            break;
+                        }
+                    } catch(java.lang.IndexOutOfBoundsException e) {}
                     x++;
                 }
             }
