@@ -221,11 +221,33 @@ public class PressSpreadButton extends JPanel implements MouseListener {
         }
     }
     
+
+    /**
+     * @param text the text of the button
+     */
+    public void setButtonText(String text) {
+        this.text.setText(text);
+    }
+
+    /**
+     * @return the button's text 
+     */
+    public String getButtonText() {
+        return this.text.getText();
+    }
+
     /**
      * @param size the desired font size
      */
     public void setFontSize(float size) {
         text.setFont(text.getFont().deriveFont(Font.PLAIN, size));
+    }
+
+    /**
+     * @param color the foreground of the text
+     */
+    public void setFontColor(Color color) {
+        text.setForeground(color);
     }
 
     /**
@@ -263,11 +285,13 @@ public class PressSpreadButton extends JPanel implements MouseListener {
         if(Press_Color != null) {
             try {
                 for(PressSpreadButtonCircle c : circles) {
-                    c.setAlpha(c.getAlpha());
-                    if(c.getAlpha() != 0) {
-                        graphics.setColor(new Color(Press_Color.getRed(), Press_Color.getGreen(), Press_Color.getBlue(), c.getAlpha()));
-                        int radius = c.getRadius();
-                        graphics.fillOval(c.getXMouse() - radius, c.getYMouse() - radius, (radius * 2), (radius * 2));
+                    if(c != null) {
+                        c.setAlpha(c.getAlpha());
+                        if(c.getAlpha() != 0) {
+                            graphics.setColor(new Color(Press_Color.getRed(), Press_Color.getGreen(), Press_Color.getBlue(), c.getAlpha()));
+                            int radius = c.getRadius();
+                            graphics.fillOval(c.getXMouse() - radius, c.getYMouse() - radius, (radius * 2), (radius * 2));
+                        }
                     }
                 }
             } 
@@ -280,8 +304,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
             graphics.setColor(new Color(Press_Color.getRed(), Press_Color.getGreen(), Press_Color.getBlue(), Alphas[4]));
             graphics.fillRoundRect(0, 0, getWidth(), getHeight(), round, round);
         }
-        
-        if(Background_Color != null) {
+        if(Press_Color != null && Background_Color != null) {
             Alphas[5] = AlphaCheck(5);
             graphics.setColor(new Color(Background_Color.getRed(), Background_Color.getGreen(), Background_Color.getBlue(), Alphas[5]));
             graphics.setStroke(new BasicStroke(6));
@@ -296,7 +319,6 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     public void fadeOutAll() {
         HoverFadeOut();
         PressFadeOut();
-
     }
 
     /**
@@ -312,6 +334,15 @@ public class PressSpreadButton extends JPanel implements MouseListener {
         }
         return Alphas[pos];
     }
+
+    /**
+     * Get the jlabel of the text in the button
+     * @return the text jlabel
+     */
+    public JLabel getTextLabel() {
+        return text;
+    }
+
     /**
      * Sets the value of increments to change alphas
      * @param value the amount increased/decreased per increment
@@ -357,6 +388,14 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      */
     public void setPressedSleepAmount(int value) {
         this.sleepAmount[1] = value;
+    }
+
+    /**
+     * Sets the value of time to change the circle size
+     * @param value the amount of time before increasing circle size
+     */
+    public void setPressedSizeSleepAmount(int value) {
+        sleepAmount[2] = value;
     }
 
     /**
@@ -463,9 +502,9 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      * Starts the hovering fade in animation
      */
     public void HoverFadeIn() {
-        changeAlphaValues(2, 1, true);
+        changeAlphaValues(2, 0, true);
         if(fadeInText) {
-            changeAlphaValues(1, 1, true);
+            changeAlphaValues(1, 0, true);
         }
     }
 
@@ -473,9 +512,9 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      * Starts the hover fade out animation
      */
     public void HoverFadeOut() {
-        changeAlphaValues(2, 1, false);
+        changeAlphaValues(2, 0, false);
         if(fadeInText) {
-            changeAlphaValues(1, 1, false);
+            changeAlphaValues(1, 0, false);
         }
     }
 
@@ -522,17 +561,17 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     public void fadeOutCircle(PressSpreadButtonCircle circle) {
         Thread t = new Thread() {
             public void run() {
-                while(!circle.getExpanding()) {
+                while(circle != null && !circle.getExpanding()) {
                     sleepTime(2);
                 }
-                while(circle.getAlpha() > 0) {
+                while(circle != null && circle.getAlpha() > 0) {
                     circle.setAlpha(circle.getAlpha() - (incrementAmount[1]));
                     update();
                     sleepTime(sleepAmount[1] * 2);
                 }
                 for(int x = 0; x < circles.size(); x++) {
                     try {
-                        if(circles.get(x).equals(circle) && (x > 0 && x < circles.size())) {
+                        if(circles.get(x) != null && circles.get(x).equals(circle) && (x > 0 && x < circles.size())) {
                             circles.remove(x);
                             break;
                         }
@@ -574,7 +613,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
                     wantedValue = 255;
                 }
                 while(switches[switchPosition] == active && Alphas[colorAlphaPos] != wantedValue) {
-                    if(active) {
+                    if(Alphas[colorAlphaPos] < wantedValue) {
                         Alphas[colorAlphaPos] += incrementAmount[switchPosition];
                     } else {
                         Alphas[colorAlphaPos] -= incrementAmount[switchPosition];
