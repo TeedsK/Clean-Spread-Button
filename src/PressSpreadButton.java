@@ -14,6 +14,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -29,8 +31,8 @@ import java.awt.Toolkit;
  * @author Teeds - Theo K
  */
 public class PressSpreadButton extends JPanel implements MouseListener {
-    ArrayList<JPanel> ParentJPanels = new ArrayList<JPanel>();
-    ArrayList<PressSpreadButtonCircle> circles = new ArrayList<PressSpreadButtonCircle>();
+    List<JPanel> ParentJPanels = Collections.synchronizedList(new ArrayList<JPanel>());
+    List<PressSpreadButtonCircle> circles = Collections.synchronizedList(new ArrayList<PressSpreadButtonCircle>());
     int round = 0; // the roundness of JPanel
     JLabel text;
     JLabel image;
