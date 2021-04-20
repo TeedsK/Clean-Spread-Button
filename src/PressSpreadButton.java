@@ -1,5 +1,3 @@
-package com.zaiko.app.Animations.Button;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
