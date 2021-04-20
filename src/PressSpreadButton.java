@@ -1,4 +1,4 @@
-package Animations.Button;
+package com.zaiko.app.Animations.Button;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -43,6 +43,8 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     int xMouse = 0;
     int yMouse = 0;
     boolean fadeInText = true;
+    boolean disableHover = false;
+    boolean disablePressed = false;
     int[] incrementAmount = {
         5, // hover increment
         10, // pressed increment
@@ -211,7 +213,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
             text.setHorizontalAlignment(JLabel.CENTER);
             Font u = new Font("Calibri", Font.PLAIN, 15);
             try {
-                u = Font.createFont(Font.TRUETYPE_FONT, new File("src/Fonts/OpenSans/open-sans.semibold.ttf"));
+                u = Font.createFont(Font.TRUETYPE_FONT, new File("app/Fonts/OpenSans/open-sans.semibold.ttf"));
             } catch(Exception err1) {}
             text.setFont(u.deriveFont(Font.PLAIN, 14.3f));
             if(image != null) {
@@ -335,6 +337,13 @@ public class PressSpreadButton extends JPanel implements MouseListener {
             return 0;
         }
         return Alphas[pos];
+    }
+
+    /**
+     * returns the roundness of the panel
+     */
+    public int getRoundness() {
+        return round;
     }
 
     /**
@@ -541,7 +550,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      * Expands the size of the circle
      * @param circle The Circle being edited
      */
-    private void expandCircleSize(PressSpreadButtonCircle circle) {
+    private void expandCircleSize(final PressSpreadButtonCircle circle) {
         Thread t = new Thread() {
             public void run() {
                 int wantedValue = (int) (getWidth() * 1.1);
@@ -560,7 +569,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      * Decreases the alpha of the circle while button being pressed
      * @param circle The Circle being edited
      */
-    public void fadeOutCircle(PressSpreadButtonCircle circle) {
+    public void fadeOutCircle(final PressSpreadButtonCircle circle) {
         Thread t = new Thread() {
             public void run() {
                 while(circle != null && !circle.getExpanding()) {
@@ -588,7 +597,7 @@ public class PressSpreadButton extends JPanel implements MouseListener {
      * Increases the alpha of the circle while button being pressed
      * @param circle The Circle being edited
      */
-    private void fadeCircleIn(PressSpreadButtonCircle circle) {
+    public void fadeCircleIn(final PressSpreadButtonCircle circle) {
         Thread t = new Thread() {
             public void run() {
                 while(switches[2] && circle.getAlpha() < 255) {
@@ -601,12 +610,21 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     }
 
     /**
+     *manually change the value of the switch
+     * @param position the position of the switches
+     * @param value the value of the swtich
+     */
+    public void setSwitch(int position, boolean value) {
+        switches[position] = value;
+    }
+
+    /**
      * Changes the alpha of the color given
      * @param colorAlphaPos The position of the alphas 0 = background, 1 = text, 2 = hovering, 3 = pressed
      * @param switchPosition boolean based off hovering or pressing, 0 = hovering, 1 = pressing
      * @param active boolean on if alpha should be increasing or decreasing, false = decreasing, true = increasing
      */
-    public void changeAlphaValues(int colorAlphaPos, int switchPosition, boolean active) {
+    public void changeAlphaValues(final int colorAlphaPos, final int switchPosition, final boolean active) {
         Thread t = new Thread() {
             public void run() {
                 switches[switchPosition] = active;
@@ -631,13 +649,27 @@ public class PressSpreadButton extends JPanel implements MouseListener {
     }
 
     /**
+     * @param value if hover animation should play
+     */
+    public void setDisableHover(boolean value) {
+        this.disableHover = value;
+    }
+
+    /**
+     * @param value if press animation should play
+     */
+    public void setDisablePress(boolean value) {
+        this.disablePressed = value;
+    }
+
+    /**
      * Changes the alpha of the color given
      * @param colorAlphaPos The position of the alphas 0 = background, 1 = text, 2 = hovering, 3 = pressed
      * @param switchPosition boolean based off hovering or pressing, 0 = hovering, 1 = pressing
      * @param active boolean on if alpha should be increasing or decreasing, false = decreasing, true = increasing
      * @param multiplier adds a multiplier to the amount the Alpha changes
      */
-    public void changeAlphaValues(int colorAlphaPos, int switchPosition, boolean active, double multiplier) {
+    public void changeAlphaValues(final int colorAlphaPos, final int switchPosition, final boolean active, final double multiplier) {
         Thread t = new Thread() {
             public void run() {
                 switches[switchPosition] = active;
@@ -676,25 +708,31 @@ public class PressSpreadButton extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        switches[2] = true;
-        xMouse = e.getX();
-        yMouse = e.getY();
-        PressFadeIn();
+        if(!disablePressed) {
+            switches[2] = true;
+            xMouse = e.getX();
+            yMouse = e.getY();
+            PressFadeIn();
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        switches[2] = false;
-        PressFadeOut();
+        if(!disablePressed) {
+            switches[2] = false;
+            PressFadeOut();
+        }
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        HoverFadeIn();
+        if(!disableHover)
+            HoverFadeIn();
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        HoverFadeOut();
+        if(!disableHover)
+            HoverFadeOut();
     }
 }
